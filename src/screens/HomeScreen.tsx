@@ -12,13 +12,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import MapTracker from "../components/MapTracker"
 
-import { COLORS } from "../constants/colors"
+import { COLORS } from "../constants/Colors"
 
 interface Props {
     navigation: any
 }
 
-export default class HomeView extends React.Component<Props> {
+export default class HomeScreen extends React.Component<Props> {
 
     onClickNavigate = async (route:string) => {    
         const hasDisclosedBackgroundPermission = await AsyncStorage.getItem('@transistorsoft:hasDisclosedBackgroundPermission') == 'true';
@@ -51,7 +51,16 @@ export default class HomeView extends React.Component<Props> {
                 buttonStyle={{backgroundColor: COLORS.theme}}
                 titleStyle={{color: COLORS.white}}
                 title="Match Map View"
-                onPress={() => this.onClickNavigate('MatchMapApp') }
+                onPress={() => this.onClickNavigate('MatchMap') }
+                />
+                <Button
+                buttonStyle={{backgroundColor: COLORS.theme}}
+                titleStyle={{color: COLORS.white}}
+                title="Logout"
+                onPress={() => {
+                    this.onClickNavigate('Auth')
+                    AsyncStorage.removeItem("@logintoken")
+                } }
                 />
             </View>
         )

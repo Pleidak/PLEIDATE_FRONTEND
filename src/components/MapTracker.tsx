@@ -81,6 +81,7 @@ export default class MapTracker extends React.Component {
   /// remove BackgroundGeolocation event subscriptions.
   componentWillUnmount() {
     this.subscriptions.forEach((subscription) => subscription.remove());
+    this.setState({enabled: true})
     BackgroundGeolocation.start();
   }
 

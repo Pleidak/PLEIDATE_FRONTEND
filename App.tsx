@@ -11,78 +11,60 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import HomeApp from './src/routes/HomeApp';
-import MatchMapApp from './src/routes/MatchMapApp';
+import { AuthScreen, HomeScreen, MatchMapScreen} from './src/screens/ScreenIndex'
+import { RootStackParamList } from './src/components/RootStackPrams';
 
-const NAVIGATION_KEY = "@transistorsoft:navigation";
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const MainStack = createNativeStackNavigator();
-
-// Custom back-button.  react-navigation does something messed up with default goBack() action.
 const screenOptions = () => {
   return {
     headerShown: false
   };
 }
 
-const App = () => {
+const App = async () => {
+  const [initialRouteName, setInitialRouteName] = React.useState("Auth")
 
-  const [isReady, setIsReady] = React.useState(false);
-  const [initialState, setInitialState] = React.useState();
-
-  React.useEffect(() => {
-    const restoreState = async () => {
+  // React.useEffect(() => {
+    const getInitialRouteName = async  () => {
       try {
-        const initialUrl = await Linking.getInitialURL();
-
-        if (Platform.OS !== 'web' && initialUrl == null) {
-          // Only restore state if there's no deep link and we're not on web
-          const savedStateString = await AsyncStorage.getItem(NAVIGATION_KEY);
-          const state = savedStateString ? JSON.parse(savedStateString) : undefined;
-
-          if (state !== undefined) {
-            setInitialState(state);
-          }
+        const savedToken= await AsyncStorage.getItem("@logintoken")
+        if (savedToken !== undefined) {
+          return "Home"
         }
-      } finally {
-        setIsReady(true);
+        else {return "Auth"}
       }
-    };
-
-    if (!isReady) {
-      restoreState();
+      catch (err) {
+        console.log(err)
+      }
     }
-  }, [isReady]);
-
-  if (!isReady) {
-    return null;
-  }
+  // })
 
   return (
-    <NavigationContainer
-      initialState={initialState}
-      onStateChange={(state) => {
-        AsyncStorage.setItem(NAVIGATION_KEY, JSON.stringify(state));
-      }}
-    >
-      <MainStack.Navigator
-        initialRouteName="HomeApp"
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName={await getInitialRouteName()}
         screenOptions={{
           headerStyle: {
             backgroundColor: '#fedd1e'
           },
         }}>
-        <MainStack.Screen
-          name="HomeApp"
-          component={HomeApp}
+        <Stack.Screen
+          name="Auth"
+          component={AuthScreen}
           options={screenOptions}
         />
-        <MainStack.Screen
-          name="MatchMapApp"
-          component={MatchMapApp}
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
           options={screenOptions}
         />
-      </MainStack.Navigator>
+        <Stack.Screen
+          name="MatchMap"
+          component={MatchMapScreen}
+          options={screenOptions}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };

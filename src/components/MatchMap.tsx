@@ -5,14 +5,14 @@ import BackgroundGeolocation, {
     Location
 } from "react-native-background-geolocation";
 import { Text } from "react-native-elements";
-import { COLORS } from "../constants/colors";
+import { COLORS } from "../constants/Colors";
 
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00421;
 const DEFAULT_LATITUDE = 21.028511
 const DEFAULT_LONGITUDE = 105.804817
 
-export default function MatchMapView() {
+export default function MatchMap() {
     const [mapCenter, setMapCenter] = React.useState({
         latitude: DEFAULT_LATITUDE,
         longitude: DEFAULT_LONGITUDE,
@@ -95,14 +95,13 @@ export default function MatchMapView() {
     return rs;
   }
 
-    
-    return (
-        <MapView
-            style={styles.map}
-            region={mapCenter}>
-            {renderMarkers()}
-        </MapView>
-    );
+  return (
+      <MapView
+          style={styles.map}
+          region={mapCenter}>
+          {renderMarkers()}
+      </MapView>
+  );
 }
 
 var styles = StyleSheet.create({

@@ -10,13 +10,13 @@ import {
 
 import MatchMap from "../components/MatchMap"
 
-import { COLORS } from "../constants/colors"
+import { COLORS } from "../constants/Colors"
 
 interface Props {
     navigation: any
 }
 
-export default class HomeView extends React.Component<Props> {
+export default class MatchMapScreen extends React.Component<Props> {
 
     render() {
         return (
