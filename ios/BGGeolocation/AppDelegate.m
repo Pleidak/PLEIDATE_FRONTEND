@@ -35,7 +35,7 @@ static void InitializeFlipper(UIApplication *application) {
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
-                                                   moduleName:@"BGGeolocation"
+                                                   moduleName:@"Pleidate"
                                             initialProperties:nil];
   
   // [REQUIRED] Register BackgroundFetch

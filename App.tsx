@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthScreen, HomeScreen, MatchMapScreen} from './src/screens/ScreenIndex'
 import { RootStackParamList } from './src/components/RootStackPrams';
 
+const MainStack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const screenOptions = () => {
@@ -22,49 +23,34 @@ const screenOptions = () => {
   };
 }
 
-const App = async () => {
-  const [initialRouteName, setInitialRouteName] = React.useState("Auth")
+const App = () => {
+  const [isLogin, setIsLogin] = React.useState(false)
 
-  // React.useEffect(() => {
-    const getInitialRouteName = async  () => {
+  React.useEffect(() => {
+    async () => {
       try {
         const savedToken= await AsyncStorage.getItem("@logintoken")
-        if (savedToken !== undefined) {
-          return "Home"
-        }
-        else {return "Auth"}
+        if (savedToken !== undefined) {setIsLogin(true)}
       }
-      catch (err) {
-        console.log(err)
-      }
+      catch (err) {console.log(err)}
     }
-  // })
+    console.log(isLogin)
+  })
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={await getInitialRouteName()}
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#fedd1e'
-          },
-        }}>
-        <Stack.Screen
-          name="Auth"
-          component={AuthScreen}
-          options={screenOptions}
-        />
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={screenOptions}
-        />
-        <Stack.Screen
-          name="MatchMap"
-          component={MatchMapScreen}
-          options={screenOptions}
-        />
-      </Stack.Navigator>
+        <Stack.Navigator>
+          <Stack.Screen
+            name= {isLogin ? "Home" : "Auth"}
+            component={AuthScreen}
+            options={screenOptions}
+          />
+          <Stack.Screen
+            name="MatchMap"
+            component={MatchMapScreen}
+            options={screenOptions}
+          />
+        </Stack.Navigator>
     </NavigationContainer>
   );
 };

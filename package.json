@@ -1,6 +1,6 @@
 {
-  "name": "BGGeolocation",
-  "version": "4.4.2",
+  "name": "pleidate",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
