@@ -1,14 +1,15 @@
 import React from "react"
-import Auth from "../components/Auth"
+import { PhoneSubmiter, VerifyPhoneNumber } from "../components/Auth"
 
-interface Props {
-    navigation: any
+const PhoneSubmitScreen = () => {
+    return (
+        <PhoneSubmiter></PhoneSubmiter>
+    )
+}
+const CodeSubmitScreen = () => {
+    return (
+        <VerifyPhoneNumber></VerifyPhoneNumber>
+    )
 }
 
-export default class AuthScreen extends React.Component<Props> {
-    render() {
-        return (
-            <Auth></Auth>
-        )
-    }
-}
+export {PhoneSubmitScreen, CodeSubmitScreen}

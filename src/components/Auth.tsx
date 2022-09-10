@@ -1,110 +1,57 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './RootStackPrams';
+import { CustomText } from '../utils/CustomText';
+import { submitPhonehandler, submitCodeHandler } from '../api/Auth';
+import { MESSAGES } from '../constants/Messages';
+import authStyle from '../public/AuthStyles';
+import { useLogin } from '../contexts/LoginProvider';
+import { navigationStack } from './NavigationStack';
+ 
 
-
-const API_URL = 'http://192.168.1.107:8000'
-
-const Auth = () => {
-
+const PhoneSubmiter = () => {
     const [phone, setPhone] = useState('');
-    const [name, setName] = useState('');
-    const [password, setPassword] = useState('');
-
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState('');
-    const [isLogin, setIsLogin] = useState(true);
+    const { setPhoneNumber } = useLogin()
 
-    const onChangeHandler = () => {
-        setIsLogin(!isLogin);
-        setMessage('');
-    };
 
-    type authScreenProp = NativeStackNavigationProp<RootStackParamList, 'Auth'>
-
-    const navigation = useNavigation<authScreenProp>()
-
-    const onLoggedIn = (token: any) => {
-        fetch(`${API_URL}/private`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, 
-            },
-        })
-        .then(async res => { 
-            try {
-                const jsonRes = await res.json();
-                if (res.status === 200) {
-                    setMessage(jsonRes.message);
-                }
-            } catch (err) {
-                console.log(err);
-            };
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    }
-
-    const onSubmitHandler = () => {
-        const payload = {
-            phone,
-            name,
-            password,
-        };
-        fetch(`${API_URL}/${isLogin ? 'login' : 'signup'}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        })
-        .then(async res => { 
-            try {
-                const jsonRes = await res.json();
-                if (res.status !== 200) {
-                    setIsError(true);
-                    setMessage(jsonRes.message);
-                } else {
-                    onLoggedIn(jsonRes.token);
-                    AsyncStorage.setItem("@logintoken", jsonRes.token)
-                    setIsError(false);
-                    setMessage(jsonRes.message);
-                    navigation.navigate("Home")
-                }
-            } catch (err) {
-                console.log(err);
-            };
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    };
-
-    const getMessage = () => {
-        const status = isError ? `Error: ` : `Success: `;
-        return status + message;
+    const submitPhone = async () => {
+        const res = await submitPhonehandler(phone)
+        if (res){
+            const jsonRes = res.data
+            if (res.status !== 200) {
+                setIsError(true)
+                setMessage(jsonRes.message)
+            } else {
+                setPhone('')
+                setIsError(false)
+                setMessage(jsonRes.message)
+            }   
+        }
+        else {
+            setPhone('')
+            setIsError(true)
+            setMessage(MESSAGES.SEND_CODE_ERROR)
+        }
     }
 
     return (
-        <ImageBackground source={require('../../images/gradient-back.jpg')} style={styles.image}>
-            <View style={styles.card}>
-                <Text style={styles.heading}>{isLogin ? 'Login' : 'Signup'}</Text>
-                <View style={styles.form}>
-                    <View style={styles.inputs}>
-                        <TextInput style={styles.input} placeholder="Phone" autoCapitalize="none" onChangeText={setPhone}></TextInput>
-                        {!isLogin && <TextInput style={styles.input} placeholder="Name" onChangeText={setName}></TextInput>}
-                        <TextInput secureTextEntry={true} style={styles.input} placeholder="Password" onChangeText={setPassword}></TextInput>
-                        <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? getMessage() : null}</Text>
-                        <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
-                            <Text style={styles.buttonText}>Done</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonAlt} onPress={onChangeHandler}>
-                            <Text style={styles.buttonAltText}>{isLogin ? 'Sign Up' : 'Log In'}</Text>
+        <ImageBackground source={require('../../images/gradient-back.jpg')} style={authStyle.image}>
+            <View style={authStyle.card}>
+                <CustomText style={authStyle.heading}>{'Đăng nhập với số điện thoại'}</CustomText>
+                <View style={authStyle.form}>
+                    <View style={authStyle.inputs}>
+                        <TextInput style={authStyle.input} placeholder="Số điện thoại" autoCapitalize="none" onChangeText={setPhone}></TextInput>
+                        <CustomText style={[authStyle.message, {color: isError ? 'red' : 'green'}]}>{message ? message : null}</CustomText>
+                        <TouchableOpacity style={authStyle.button} onPress={
+                            () => {
+                                submitPhone()
+                                setPhoneNumber(phone)
+                                if (!isError){navigationStack.navigate('CodeSubmit')}
+                            }
+                            }>
+                            <CustomText style={authStyle.buttonText}>Tiếp tục</CustomText>
                         </TouchableOpacity>
                     </View>    
                 </View>
@@ -113,83 +60,56 @@ const Auth = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    image: {
-        flex: 1,
-        width: '100%',
-        alignItems: 'center',
-    },  
-    card: {
-        flex: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.4)',
-        width: '80%',
-        marginTop: '40%',
-        borderRadius: 20,
-        maxHeight: 380,
-        paddingBottom: '30%',
-    },
-    heading: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        marginLeft: '10%',
-        marginTop: '5%',
-        marginBottom: '30%',
-        color: 'black',
-    },
-    form: {
-        flex: 1,
-        justifyContent: 'space-between',
-        paddingBottom: '5%',
-    },
-    inputs: {
-        width: '100%',
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: '10%',
-    },  
-    input: {
-        width: '80%',
-        borderBottomWidth: 1,
-        borderBottomColor: 'black',
-        paddingTop: 10,
-        fontSize: 16, 
-        minHeight: 40,
-    },
-    button: {
-        width: '80%',
-        backgroundColor: 'black',
-        height: 40,
-        borderRadius: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 5,
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '400'
-    },
-    buttonAlt: {
-        width: '80%',
-        borderWidth: 1,
-        height: 40,
-        borderRadius: 50,
-        borderColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 5,
-    },
-    buttonAltText: {
-        color: 'black',
-        fontSize: 16,
-        fontWeight: '400',
-    },
-    message: {
-        fontSize: 16,
-        marginVertical: '5%',
-    },
-});
+const VerifyPhoneNumber = () => {
+    const { phoneNumber, setIsLoggedIn } = useLogin()
+    const [code, setCode] = useState('');
+    const [isError, setIsError] = useState(false);
+    const [message, setMessage] = useState('');
+    console.log(phoneNumber)
+    const submitCode = async () => {
+        const res = await submitCodeHandler(phoneNumber, code)
+        if (res){
+            const jsonRes = res.data
+            if (res.status !== 200) {
+                setIsError(true)
+                setMessage(jsonRes.message)
+            } else {
+                AsyncStorage.setItem("@logintoken", jsonRes.token)
+                setIsError(false)
+                setMessage(jsonRes.message)
+            }   
+        }
+        else {
+            setIsError(true)
+            setMessage(MESSAGES.SEND_CODE_ERROR)
+        }
+    }
 
 
-export default Auth;
+    return (
+        <ImageBackground source={require('../../images/gradient-back.jpg')} style={authStyle.image}>
+            <View style={authStyle.card}>
+                <Text style={authStyle.heading}>{'Mã xác thực của bạn là?'}</Text>
+                <Text style={authStyle.content}>{`Nhập mã xác thực được gửi đến ${phoneNumber}`}</Text>
+                <View style={authStyle.form}>
+                    <View style={authStyle.inputs}>
+                        <TextInput style={authStyle.input} placeholder="Mã xác thực" autoCapitalize="none" onChangeText={setCode}></TextInput>
+                        <Text style={[authStyle.message, {color: isError ? 'red' : 'green'}]}>{message ? message : null}</Text>
+                        <TouchableOpacity style={authStyle.button} onPress={
+                            async () => {
+                                await submitCode()
+                                if (!isError) {
+                                    setIsLoggedIn(true)
+                                }
+                            }
+                            }>
+                            <Text style={authStyle.buttonText}>Tiếp tục</Text>
+                        </TouchableOpacity>
+                    </View>    
+                </View>
+            </View>
+        </ImageBackground>
+    );
+}
+
+export { PhoneSubmiter, VerifyPhoneNumber}

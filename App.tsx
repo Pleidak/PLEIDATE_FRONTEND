@@ -1,59 +1,24 @@
 import React from 'react';
 import {
-  Linking,
-  Platform,
   StyleSheet,
 } from 'react-native';
-
-
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginProvider from './src/contexts/LoginProvider';
+import MainNavigator from './src/navigations/MainNavigator';
+import { SocketContext, socket } from './src/contexts/Socket';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { AuthScreen, HomeScreen, MatchMapScreen} from './src/screens/ScreenIndex'
-import { RootStackParamList } from './src/components/RootStackPrams';
-
-const MainStack = createNativeStackNavigator();
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const screenOptions = () => {
-  return {
-    headerShown: false
-  };
-}
 
 const App = () => {
-  const [isLogin, setIsLogin] = React.useState(false)
-
-  React.useEffect(() => {
-    async () => {
-      try {
-        const savedToken= await AsyncStorage.getItem("@logintoken")
-        if (savedToken !== undefined) {setIsLogin(true)}
-      }
-      catch (err) {console.log(err)}
-    }
-    console.log(isLogin)
-  })
-
-  return (
-    <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name= {isLogin ? "Home" : "Auth"}
-            component={AuthScreen}
-            options={screenOptions}
-          />
-          <Stack.Screen
-            name="MatchMap"
-            component={MatchMapScreen}
-            options={screenOptions}
-          />
-        </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+    return (
+      <SocketContext.Provider value={socket}>
+        <LoginProvider>
+          <NavigationContainer>
+            <MainNavigator/>
+          </NavigationContainer>
+        </LoginProvider>
+      </SocketContext.Provider>
+    )
+}
 
 const styles = StyleSheet.create({
   button: {

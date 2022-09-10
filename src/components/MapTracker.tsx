@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   Switch,
   Text,
@@ -6,41 +6,82 @@ import {
 } from 'react-native';
 
 import BackgroundGeolocation, {
-  Location,
   Subscription
 } from "react-native-background-geolocation";
+import { Button } from 'react-native-elements/dist/buttons/Button';
+import { SocketContext } from '../contexts/Socket';
 
-export default class MapTracker extends React.Component {
-  subscriptions:Subscription[] = [];
-  state:any = {};
-  constructor(props:any) {
-    super(props);
-    this.state = {
-      enabled: true,
-      location: ''
-    }
-  }
+import { COLORS } from "../constants/Colors"
+import { logout } from "../api/Auth"
+import { removeAsyncStorageItem } from "../utils/AsyncStorage"
+import { useLogin } from '../contexts/LoginProvider';
 
-  componentDidMount() {
-    /// 1.  Subscribe to BackgroundGeolocation events.
-    this.subscriptions.push(BackgroundGeolocation.onLocation((location) => {
+
+const MapTracker = () => {
+  console.log(2222)
+  const [enabled, setEnabled] = useState(false);
+  const [location, setLocation] = useState('');
+  const { setIsLoggedIn } = useLogin()
+
+  const socket = useContext(SocketContext);
+  // const [joinStatus, setJoinStatus] = useState(false);
+
+  let joinStatus = false
+
+  // const handleInviteAccepted = useCallback(() => {
+  //   setJoinStatus(true);
+  //   console.log("Join OK")
+  // }, []);
+  // const trackingLocationHandler = () =>{
+    let latitude = 21.030653
+    let longitude = 105.847130
+    const locationInterval = setInterval(()=>{
       console.log('[onLocation]', location);
-      this.setState({location: JSON.stringify(location, null, 2)})
-    }, (error) => {
-      console.log('[onLocation] ERROR:', error);
-    }))
+      // const trackingData = {
+      //   latitude: location.coords.latitude,
+      //   longitude: location.coords.longitude,
+      //   timestamp: location.timestamp
+      // }
+      const trackingData = {
+        latitude: latitude += 1,
+        longitude: longitude += 1,
+        timestamp: Date.now()
+      }
+      // setLocation(JSON.stringify(location, null, 2));
+      if (!joinStatus){
+        socket.emit("joinTracking", {room: 'tracking'});
+        socket.on("joinStatus", (data: any)=>{
+          if (data.status){
+            joinStatus = true
+            console.log(joinStatus)
+            console.log("Join OK")
+          }
+        }); 
+      }
+      
+      socket.emit("trackingLocation", trackingData)
+    }, 1000)
+  // }
+  
 
-    this.subscriptions.push(BackgroundGeolocation.onMotionChange((event) => {
+  useEffect(() => {
+    /// 1.  Subscribe to events.
+    // const onLocation:Subscription = BackgroundGeolocation.onLocation((location) => {
+
+
+    // })
+
+    const onMotionChange:Subscription = BackgroundGeolocation.onMotionChange((event) => {
       console.log('[onMotionChange]', event);
-    }))
+    });
 
-    this.subscriptions.push(BackgroundGeolocation.onActivityChange((event) => {
-      console.log('[onActivityChange]', event);
-    }))
+    const onActivityChange:Subscription = BackgroundGeolocation.onActivityChange((event) => {
+      console.log('[onMotionChange]', event);
+    })
 
-    this.subscriptions.push(BackgroundGeolocation.onProviderChange((event) => {
+    const onProviderChange:Subscription = BackgroundGeolocation.onProviderChange((event) => {
       console.log('[onProviderChange]', event);
-    }))
+    })
 
     /// 2. ready the plugin.
     BackgroundGeolocation.ready({
@@ -70,40 +111,56 @@ export default class MapTracker extends React.Component {
         "auth_token": "maybe_your_server_authenticates_via_token_YES?"
       }
     }).then((state) => {
-      this.setState({enabled: state.enabled});
+      setEnabled(state.enabled)
       console.log("- BackgroundGeolocation is configured and ready: ", state.enabled);
-    }).catch((error) => {
-      throw error;
-    })
-  }
+    });
 
-  /// When view is destroyed (or refreshed during development live-reload),
-  /// remove BackgroundGeolocation event subscriptions.
-  componentWillUnmount() {
-    this.subscriptions.forEach((subscription) => subscription.remove());
-    this.setState({enabled: true})
-    BackgroundGeolocation.start();
-  }
+    return () => {
+      // Remove BackgroundGeolocation event-subscribers when the View is removed or refreshed
+      // during development live-reload.  Without this, event-listeners will accumulate with
+      // each refresh during live-reload.
+      // onLocation.remove();
+      onMotionChange.remove();
+      onActivityChange.remove();
+      onProviderChange.remove();
+    }
+  }, []);
 
+  console.log(joinStatus)
 
-  // onToggleEnabled(value:boolean) {
-  //   console.log('[onToggleEnabled]', value);
-  //   this.setState({enabled: value})
-  //   if (value) {
-  //     BackgroundGeolocation.start();
-  //   } else {
-  //     this.setState({location: ''});
-  //     BackgroundGeolocation.stop();
-  //   }
-  // }
+  /// 3. start / stop BackgroundGeolocation
+  useEffect(() => {
+    if (enabled) {
+      BackgroundGeolocation.start();
+    } else {
+      BackgroundGeolocation.stop();
+      setLocation('');
+    }
+  }, [enabled]);
 
-  render() {
-    return (
-      <View style={{alignItems:'center'}}>
-        <Text>Click to enable BackgroundGeolocation</Text>
-        {/* <Switch value={this.state.enabled} onValueChange={this.onToggleEnabled.bind(this)} /> */}
-        <Text style={{fontFamily:'monospace', fontSize:12}}>{this.state.location}</Text>
-      </View>
-    )
-  }
+  return (
+    <View style={{alignItems:'center'}}>
+      <Text>Click to enable BackgroundGeolocation</Text>
+      <Button
+            buttonStyle={{backgroundColor: COLORS.theme}}
+            titleStyle={{color: COLORS.white}}
+            title="Logout"
+            onPress={async () => {
+                const isLoggedOut = await logout()
+                console.log("olala")
+                console.log(isLoggedOut)
+                if (isLoggedOut){
+                    setIsLoggedIn(false)
+                    removeAsyncStorageItem("@logintoken")
+                    clearInterval(locationInterval)
+                    socket.disconnect()
+                }
+            }}
+            />
+      <Switch value={enabled} onValueChange={setEnabled} />
+      <Text style={{fontFamily:'monospace', fontSize:12}}>{location}</Text>
+    </View>
+  )
 }
+
+export default MapTracker;
