@@ -9,22 +9,41 @@ import BackgroundGeolocation, {
   Subscription
 } from "react-native-background-geolocation";
 import { Button } from 'react-native-elements/dist/buttons/Button';
-import { SocketContext } from '../contexts/Socket';
-
 import { COLORS } from "../constants/Colors"
 import { logout } from "../api/Auth"
 import { removeAsyncStorageItem } from "../utils/AsyncStorage"
 import { useLogin } from '../contexts/LoginProvider';
+// import { useSocket } from '../contexts/SocketProvider';
+import io from "socket.io-client";
+import { SERVER_INFO } from '../constants/Server';
+import { getMeetings } from '../api/Home';
+
+const SOCKET_URL = 'ws://' + SERVER_INFO.HOST + ":" + SERVER_INFO.SOCKET_PORT.toString()
 
 
 const MapTracker = () => {
+  const socket = io(SOCKET_URL);
+
+
   console.log(2222)
+  socket.on('connect', () => { console.log('connected!')})
+  socket.on('disconnect', function(){
+    console.log('disconnected!')
+    });
+
+  console.log("aaa ", socket.connected);
   const [enabled, setEnabled] = useState(false);
   const [location, setLocation] = useState('');
   const { setIsLoggedIn } = useLogin()
 
-  const socket = useContext(SocketContext);
+  // const { socket, setSocket } = useSocket()
+  // console.log(srocket)
+
+  // setSocket(socketIO)
   // const [joinStatus, setJoinStatus] = useState(false);
+  // console.log(setIsLoggedIn)
+  console.log(socket)
+  
 
   let joinStatus = false
 
@@ -35,33 +54,34 @@ const MapTracker = () => {
   // const trackingLocationHandler = () =>{
     let latitude = 21.030653
     let longitude = 105.847130
-    const locationInterval = setInterval(()=>{
-      console.log('[onLocation]', location);
-      // const trackingData = {
-      //   latitude: location.coords.latitude,
-      //   longitude: location.coords.longitude,
-      //   timestamp: location.timestamp
-      // }
-      const trackingData = {
-        latitude: latitude += 1,
-        longitude: longitude += 1,
-        timestamp: Date.now()
-      }
-      // setLocation(JSON.stringify(location, null, 2));
-      if (!joinStatus){
-        socket.emit("joinTracking", {room: 'tracking'});
-        socket.on("joinStatus", (data: any)=>{
-          if (data.status){
-            joinStatus = true
-            console.log(joinStatus)
-            console.log("Join OK")
-          }
-        }); 
-      }
+  //   const locationInterval = setInterval(()=>{
+  //     console.log('[onLocation]', location);
+  //   //   // const trackingData = {
+  //   //   //   latitude: location.coords.latitude,
+  //   //   //   longitude: location.coords.longitude,
+  //   //   //   timestamp: location.timestamp
+  //   //   // }
+  //     const trackingData = {
+  //       latitude: latitude += 1,
+  //       longitude: longitude += 1,
+  //       timestamp: Date.now()
+  //     }
+  //   //   // setLocation(JSON.stringify(location, null, 2));
+  //     if (!joinStatus){
+  //   //     console.log(123)
+  //       socket.emit("joinTracking", {room: 'tracking'});
+  //       socket.on("joinStatus", (data: any)=>{
+  //         if (data.status){
+  //           joinStatus = true
+  //           console.log(joinStatus)
+  //           console.log("Join OK")
+  //         }
+  //       }); 
+  //     }
       
-      socket.emit("trackingLocation", trackingData)
-    }, 1000)
-  // }
+  //     socket.emit("trackingLocation", trackingData)
+  //   }, 1000)
+  // // }
   
 
   useEffect(() => {
@@ -152,7 +172,8 @@ const MapTracker = () => {
                 if (isLoggedOut){
                     setIsLoggedIn(false)
                     removeAsyncStorageItem("@logintoken")
-                    clearInterval(locationInterval)
+                    // clearInterval(locationInterval)
+                    console.log(socket.connected)
                     socket.disconnect()
                 }
             }}

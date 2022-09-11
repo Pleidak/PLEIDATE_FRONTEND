@@ -13,7 +13,7 @@ import { logout } from "../api/Auth"
 import { useLogin } from "../contexts/LoginProvider"
 import { navigationStack } from  "../components/NavigationStack"
 import { removeAsyncStorageItem } from "../utils/AsyncStorage"
-import { SocketContext } from "../contexts/Socket"
+// import { SocketProvider } from "../contexts/SocketProvider"
 
 
 const MeetingScreen = () => {

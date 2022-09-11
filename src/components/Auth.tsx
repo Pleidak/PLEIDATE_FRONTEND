@@ -7,6 +7,7 @@ import { MESSAGES } from '../constants/Messages';
 import authStyle from '../public/AuthStyles';
 import { useLogin } from '../contexts/LoginProvider';
 import { navigationStack } from './NavigationStack';
+
  
 
 const PhoneSubmiter = () => {
@@ -65,9 +66,11 @@ const VerifyPhoneNumber = () => {
     const [code, setCode] = useState('');
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState('');
-    console.log(phoneNumber)
     const submitCode = async () => {
+        console.log(1)
         const res = await submitCodeHandler(phoneNumber, code)
+        console.log(res)
+
         if (res){
             const jsonRes = res.data
             if (res.status !== 200) {
@@ -84,7 +87,6 @@ const VerifyPhoneNumber = () => {
             setMessage(MESSAGES.SEND_CODE_ERROR)
         }
     }
-
 
     return (
         <ImageBackground source={require('../../images/gradient-back.jpg')} style={authStyle.image}>
