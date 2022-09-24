@@ -22,4 +22,4 @@ const removeAsyncStorageItem = async (key: string) => {
     }
 }
 
-export {getAsyncStorageItem, removeAsyncStorageItem}
+export {AsyncStorage, getAsyncStorageItem, removeAsyncStorageItem}

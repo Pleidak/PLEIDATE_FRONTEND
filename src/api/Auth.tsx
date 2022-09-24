@@ -25,6 +25,33 @@ const submitCodeHandler = async (phone: string, code: string) => {
     return res
 }
 
+const submitInfoHandler = async (infoKey: string, infoValue: any) => {
+    const token = await getAsyncStorageItem("@logintoken")
+    let headers = {}
+    if (infoKey == 'avatar'){
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    else {
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    const res = await client.post('/addInfoBegin', {
+        infoKey: infoKey,
+        infoValue: infoValue
+    },{
+        headers: headers
+    })
+    console.log(res)
+    return res
+}
+
+
 const logout = async ()=> {
     const token = await getAsyncStorageItem("@logintoken")
     if (token){
@@ -40,4 +67,4 @@ const logout = async ()=> {
    
 }
 
-export {submitPhonehandler, submitCodeHandler, logout}
+export {submitPhonehandler, submitCodeHandler, submitInfoHandler, logout}

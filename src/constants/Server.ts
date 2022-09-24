@@ -1,5 +1,5 @@
 export const SERVER_INFO = {
-    HOST: "192.168.1.107",
+    HOST: "192.168.0.101",
     PORT: 8000,
     SOCKET_PORT: 8001
 }

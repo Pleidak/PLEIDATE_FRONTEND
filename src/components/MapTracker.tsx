@@ -9,87 +9,95 @@ import BackgroundGeolocation, {
   Subscription
 } from "react-native-background-geolocation";
 import { Button } from 'react-native-elements/dist/buttons/Button';
-import { COLORS } from "../constants/Colors"
+import { Colors } from "../constants/Colors"
 import { logout } from "../api/Auth"
-import { removeAsyncStorageItem } from "../utils/AsyncStorage"
+import { AsyncStorage, getAsyncStorageItem, removeAsyncStorageItem } from "../utils/AsyncStorage"
 import { useLogin } from '../contexts/LoginProvider';
-// import { useSocket } from '../contexts/SocketProvider';
 import io from "socket.io-client";
 import { SERVER_INFO } from '../constants/Server';
-import { getMeetings } from '../api/Home';
 
 const SOCKET_URL = 'ws://' + SERVER_INFO.HOST + ":" + SERVER_INFO.SOCKET_PORT.toString()
+const BASE_URL = 'http://' + SERVER_INFO.HOST + ':' + SERVER_INFO.PORT.toString()
 
 
 const MapTracker = () => {
   const socket = io(SOCKET_URL);
 
-
-  console.log(2222)
-  socket.on('connect', () => { console.log('connected!')})
-  socket.on('disconnect', function(){
-    console.log('disconnected!')
-    });
-
-  console.log("aaa ", socket.connected);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [location, setLocation] = useState('');
   const { setIsLoggedIn } = useLogin()
+  const { phoneNumber } = useLogin()
 
-  // const { socket, setSocket } = useSocket()
-  // console.log(srocket)
+  const getDeviceInfo = async () => {
+    await BackgroundGeolocation.getDeviceInfo();
+  }
 
-  // setSocket(socketIO)
-  // const [joinStatus, setJoinStatus] = useState(false);
-  // console.log(setIsLoggedIn)
-  console.log(socket)
+  const readyBGLocationService = async () => {
+    const locationToken = await getAsyncStorageItem("@logintoken")
+    // const tokenBG = await BackgroundGeolocation.findOrCreateTransistorAuthorizationToken(token.toString(), "username", 'http://192.168.137.66:8000');
+    await BackgroundGeolocation.ready({
+      // Geolocation Config
+      desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+      distanceFilter: 0,
+      reset: false,
+      // Activity Recognition
+      stopTimeout: 5,
+      maxDaysToPersist: 14,
+      // Application config
+      // debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+      logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
+      stopOnTerminate: false,   // <-- Allow the background-service to continue tracking when user closes the app.
+      startOnBoot: true,        // <-- Auto start tracking when device is powered-up.
+      // HTTP / SQLite config
+      // url: 'http://yourserver.com/locations',
+      url: BASE_URL + "/api/locations",
+      batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+      autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
+      preventSuspend: true,
+      isMoving: true,
+      enableHeadless: true,
+      // schedule: [
+      //   "2-8 6:00-11:00",   // Mon-Fri: 6:00am to 11:00pm
+      // ],
+      // headers: {              // <-- Optional HTTP headers
+      //   "Authorization": `Bearer ${token}`
+      // },
+      // params: {               // <-- Optional HTTP params
+      //   "auth_token": token
+      // },
+      authorization: {
+        strategy: "JWT",
+        accessToken: locationToken.toString(),
+        refreshToken: locationToken.toString(),
+        refreshPayload: {
+          refresh_token: "{refreshToken}"
+        },
+        expires: -1
+      }
+    }).then((state) => {
+      setEnabled(state.enabled)
+      console.log("- BackgroundGeolocation is configured and ready: ", state.enabled);
+    });
+  }
+
+  React.useEffect(() => {
+    getDeviceInfo();
+  }, []);
   
-
-  let joinStatus = false
-
-  // const handleInviteAccepted = useCallback(() => {
-  //   setJoinStatus(true);
-  //   console.log("Join OK")
-  // }, []);
-  // const trackingLocationHandler = () =>{
-    let latitude = 21.030653
-    let longitude = 105.847130
-  //   const locationInterval = setInterval(()=>{
-  //     console.log('[onLocation]', location);
-  //   //   // const trackingData = {
-  //   //   //   latitude: location.coords.latitude,
-  //   //   //   longitude: location.coords.longitude,
-  //   //   //   timestamp: location.timestamp
-  //   //   // }
-  //     const trackingData = {
-  //       latitude: latitude += 1,
-  //       longitude: longitude += 1,
-  //       timestamp: Date.now()
-  //     }
-  //   //   // setLocation(JSON.stringify(location, null, 2));
-  //     if (!joinStatus){
-  //   //     console.log(123)
-  //       socket.emit("joinTracking", {room: 'tracking'});
-  //       socket.on("joinStatus", (data: any)=>{
-  //         if (data.status){
-  //           joinStatus = true
-  //           console.log(joinStatus)
-  //           console.log("Join OK")
-  //         }
-  //       }); 
-  //     }
-      
-  //     socket.emit("trackingLocation", trackingData)
-  //   }, 1000)
-  // // }
-  
-
   useEffect(() => {
     /// 1.  Subscribe to events.
-    // const onLocation:Subscription = BackgroundGeolocation.onLocation((location) => {
+    const onLocation:Subscription = BackgroundGeolocation.onLocation((location) => {
+      setLocation(JSON.stringify(location, null, 2));
+      // const trackingData = {
+      //   latitude: location.coords.latitude,
+      //   longitude: location.coords.longitude,
+      //   timestamp: location.timestamp
+      // }
+      console.log("[location]", location)
+      // socket.emit("trackingLocation", trackingData)
+    })
 
-
-    // })
+    
 
     const onMotionChange:Subscription = BackgroundGeolocation.onMotionChange((event) => {
       console.log('[onMotionChange]', event);
@@ -102,57 +110,29 @@ const MapTracker = () => {
     const onProviderChange:Subscription = BackgroundGeolocation.onProviderChange((event) => {
       console.log('[onProviderChange]', event);
     })
+    
+    // const token = BackgroundGeolocation.findOrCreateTransistorAuthorizationToken("Pleidate", "tracking", BASE_URL);
 
     /// 2. ready the plugin.
-    BackgroundGeolocation.ready({
-      // Geolocation Config
-      desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-      distanceFilter: 0,
-      // Activity Recognition
-      stopTimeout: 5,
-      // Application config
-      // debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-      logLevel: BackgroundGeolocation.LOG_LEVEL_VERBOSE,
-      stopOnTerminate: false,   // <-- Allow the background-service to continue tracking when user closes the app.
-      startOnBoot: true,        // <-- Auto start tracking when device is powered-up.
-      // HTTP / SQLite config
-      // url: 'http://yourserver.com/locations',
-      batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
-      autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
-      preventSuspend: true,
-      isMoving: true,
-      schedule: [
-        "2-8 6:00-11:00",   // Mon-Fri: 6:00am to 11:00pm
-      ],
-      headers: {              // <-- Optional HTTP headers
-        "X-FOO": "bar"
-      },
-      params: {               // <-- Optional HTTP params
-        "auth_token": "maybe_your_server_authenticates_via_token_YES?"
-      }
-    }).then((state) => {
-      setEnabled(state.enabled)
-      console.log("- BackgroundGeolocation is configured and ready: ", state.enabled);
-    });
-
+    readyBGLocationService()
     return () => {
       // Remove BackgroundGeolocation event-subscribers when the View is removed or refreshed
       // during development live-reload.  Without this, event-listeners will accumulate with
       // each refresh during live-reload.
-      // onLocation.remove();
+      onLocation.remove();
       onMotionChange.remove();
       onActivityChange.remove();
       onProviderChange.remove();
     }
   }, []);
 
-  console.log(joinStatus)
-
   /// 3. start / stop BackgroundGeolocation
   useEffect(() => {
     if (enabled) {
+      console.log("start")
       BackgroundGeolocation.start();
     } else {
+      console.log("stop")
       BackgroundGeolocation.stop();
       setLocation('');
     }
@@ -160,25 +140,24 @@ const MapTracker = () => {
 
   return (
     <View style={{alignItems:'center'}}>
-      <Text>Click to enable BackgroundGeolocation</Text>
+      {/* <Text>Click to enable BackgroundGeolocation</Text> */}
       <Button
-            buttonStyle={{backgroundColor: COLORS.theme}}
-            titleStyle={{color: COLORS.white}}
+            buttonStyle={{backgroundColor: Colors.THEME}}
+            titleStyle={{color: Colors.WHITE}}
             title="Logout"
             onPress={async () => {
                 const isLoggedOut = await logout()
-                console.log("olala")
-                console.log(isLoggedOut)
                 if (isLoggedOut){
                     setIsLoggedIn(false)
                     removeAsyncStorageItem("@logintoken")
+                    // removeAsyncStorageItem("@locationToken")
                     // clearInterval(locationInterval)
-                    console.log(socket.connected)
+                    
                     socket.disconnect()
                 }
             }}
             />
-      <Switch value={enabled} onValueChange={setEnabled} />
+      {/* <Switch value={enabled} onValueChange={setEnabled} /> */}
       <Text style={{fontFamily:'monospace', fontSize:12}}>{location}</Text>
     </View>
   )

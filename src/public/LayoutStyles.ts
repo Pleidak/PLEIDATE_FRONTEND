@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Keyframe } from 'react-native-reanimated';
-import { COLORS } from "../constants/Colors";
+import { Colors } from "../constants/Colors";
 
 const Spin = new Keyframe({
     0: {
@@ -23,7 +23,7 @@ const FrameStyle = StyleSheet.create({
     },
     spinner: {
         fontSize: 30,
-        color: COLORS.grey
+        color: Colors.GREY
     }
 })
 

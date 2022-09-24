@@ -1,0 +1,15 @@
+export const defaultText = {
+    FACEBOOK_LOGIN_BTN: "Tiếp tục với Facebook",
+    PHONE_LOGIN_BTN: "Sử dụng số diện thoại",
+    PRIVACY_REMINDER: "Bằng việc đăng ký, bạn đồng ý với Chính sách của chúng tôi. Xem cách chúng tôi sử dụng dữ liệu của bạn trong Chính sách quyền riêng tư.",
+    PHONE_SUBMIT_TITLE: "Số điện thoại của bạn là?",
+    PHONE_SUBMIT_CONTENT: "Bằng việc tiếp tục, Pleidate sẽ gửi một mã xác thực đến số điện thoại của bạn. Khi xác thực thành công, Pleidate sẽ dùng số điện thoại của bạn làm tài khoản đăng nhập",
+    INFO_NOT_SHARING_PRIVACY: "Thông tin này sẽ không được chia sẻ với mọi người và sẽ không hiển thị trong hồ sơ của bạn",
+    INFO_SHARING_PRIVACY: "Thông tin này sẽ được hiển thị trong hồ sơ của bạn",
+    CODE_SUBMIT_TITLE: "Mã của tôi là?",
+    CODE_SUBMIT_CONTENT: "Nhập mã xác thực được gửi đến",
+    NAME_SUBMIT_TITLE: "Tên của bạn là gì?",
+    NAME_SUBMIT_CONTENT: "Bạn sẽ không thể thay đổi thông tin này về sau",
+    AVATAR_SUBMIT_TITLE: "Thêm ảnh đầu tiên của bạn",
+    AVATAR_SUBMIT_CONTENT: "Hãy thêm ít nhất 3 ảnh của bạn để nổi bật hơn vơi mọi người",
+}

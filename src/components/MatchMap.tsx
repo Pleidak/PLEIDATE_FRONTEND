@@ -5,14 +5,14 @@ import BackgroundGeolocation, {
     Location
 } from "react-native-background-geolocation";
 import { Text } from "react-native-elements";
-import { COLORS } from "../constants/Colors";
+import { Colors } from "../constants/Colors";
 
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00421;
 const DEFAULT_LATITUDE = 21.028511
 const DEFAULT_LONGITUDE = 105.804817
 
-export default function MatchMap() {
+const MatchMap = () => {
     const [mapCenter, setMapCenter] = React.useState({
         latitude: DEFAULT_LATITUDE,
         longitude: DEFAULT_LONGITUDE,
@@ -31,11 +31,23 @@ export default function MatchMap() {
     const subscribe = (subscription:any) => {
         subscriptions.push(subscription);
     }
+
+    // const unsubscribe = () => {
+    //   subscriptions.forEach((subscription:any) => subscription.remove());
+    //   subscriptions.splice(0, subscriptions.length);
+    // }
+
     React.useEffect(() => {
         // All BackgroundGeolocation event-listeners use React.useState setters.
         subscribe(BackgroundGeolocation.onLocation(setLocation, (error) => {
           console.warn('[onLocation] ERROR: ', error);
         }));
+
+        return () => {
+          // Important for with live-reload to remove BackgroundGeolocation event subscriptions.
+          // unsubscribe();
+          clearMarkers();
+        }
     });
 
     React.useEffect(() => {
@@ -95,6 +107,11 @@ export default function MatchMap() {
     return rs;
   }
 
+  const clearMarkers = () => {
+    setCoordinates([]);
+    setMarkers([]);
+  }
+
   return (
       <MapView
           style={styles.map}
@@ -114,10 +131,12 @@ var styles = StyleSheet.create({
     markerIcon: {
         borderWidth:1,
         borderColor:'#000000',
-        backgroundColor: COLORS.polyline_color,
+        backgroundColor: Colors.POLYLINE,
         //backgroundColor: 'rgba(0,179,253, 0.6)',
         width: 10,
         height: 10,
         borderRadius: 5
       }
   });
+
+export default MatchMap

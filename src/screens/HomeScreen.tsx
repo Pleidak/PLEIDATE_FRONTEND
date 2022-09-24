@@ -8,23 +8,24 @@ import {
 
 import MapTracker from "../components/MapTracker"
 import MatchMap from "../components/MatchMap"
-import { COLORS } from "../constants/Colors"
-import { logout } from "../api/Auth"
-import { useLogin } from "../contexts/LoginProvider"
+import { Colors } from "../constants/Colors"
 import { navigationStack } from  "../components/NavigationStack"
-import { removeAsyncStorageItem } from "../utils/AsyncStorage"
 // import { SocketProvider } from "../contexts/SocketProvider"
 
 
 const MeetingScreen = () => {
+    console.log(333)
     return (
         <View style={{ padding: 20, flex: 1, flexDirection: 'column', justifyContent: 'space-around' }}>
             <MapTracker></MapTracker>
             <Button
-            buttonStyle={{backgroundColor: COLORS.theme}}
-            titleStyle={{color: COLORS.white}}
-            title="Match Map View"
-            onPress={() => {navigationStack.navigate('MatchMap')} }
+                buttonStyle={{backgroundColor: Colors.THEME}}
+                titleStyle={{color: Colors.WHITE}}
+                title="Match Map View"
+                onPress={() => {
+                    console.log(222)
+                    navigationStack.navigate('MatchMap')
+                } }
             />
         </View>
     )
