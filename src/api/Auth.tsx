@@ -29,31 +29,39 @@ const submitInfoHandler = async (infoKey: string, infoValue: any) => {
     console.log(infoKey)
     console.log(infoKey)
     const token = await getAsyncStorageItem("@logintoken")
-    let headers = {}
-    let body = null
-    if (infoKey == 'avatar'){
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
-        }
-        body = new FormData();
-        for (let i = 0; i < infoValue.length; i++) {
-            body.append('avatar', infoValue[i]);
-        } 
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
     }
-    else {
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-        body = {
-            infoKey: infoKey,
-            infoValue: infoValue
-        }
+    const body = {
+        infoKey: infoKey,
+        infoValue: infoValue
     }
-    console.log(body)
     const res = await client.post('/addInfoBegin', body, {
+        headers: headers
+    })
+    console.log(res)
+    return res
+}
+
+const submitMediaHandler = async (infoKey: string, infoValue: any) => {
+    console.log(infoKey)
+    console.log(infoKey)
+    const token = await getAsyncStorageItem("@logintoken")
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+    }
+    const formData = new FormData();
+    for (let i = 0; i < infoValue.length; i++) {
+        formData.append('profile', {
+            name: new Date() + '_profile',
+            uri: infoValue[i].uri,
+            type: infoValue[i].type,
+          });
+    } 
+    const res = await client.post('/addMedia', formData, {
         headers: headers
     })
     console.log(res)
@@ -76,4 +84,4 @@ const logout = async ()=> {
    
 }
 
-export {submitPhonehandler, submitCodeHandler, submitInfoHandler, logout}
+export {submitPhonehandler, submitCodeHandler, submitInfoHandler, submitMediaHandler, logout}

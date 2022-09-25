@@ -10,7 +10,7 @@ import {
     useBlurOnFulfill,
     useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import { submitPhonehandler, submitCodeHandler, submitInfoHandler } from '../api/Auth';
+import { submitPhonehandler, submitCodeHandler, submitInfoHandler, submitMediaHandler } from '../api/Auth';
 import { MESSAGES } from '../constants/Messages';
 import authStyle from '../public/AuthStyles';
 import { useLogin } from '../contexts/LoginProvider';
@@ -365,21 +365,24 @@ const AddUserName = () => {
 }
 
 const AddUserAvatar = () => {
-    const [userAvatar, setUserAvatar] = useState([''])
+    const avatarInitState = [{'uri': null}, {'uri': null}, {'uri': null}]
+    const [userAvatar, setUserAvatar] = useState(avatarInitState)
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState('');
     const [progress, setProgress] = useState(0);
 
     const addAvatar = (data: any, userAvatar: any) => {
-        const avatars = []
-        console.log(data)
-        if (data && (data.length + userAvatar.length) <= 3){
-            for (let i=0; i<data.length; i++){
-                avatars.push(data[i].uri)
+        // const avatars = []
+        let newAvatarObj = userAvatar
+        if (data && data.length <= 3){
+            for (let i=0; i<newAvatarObj.length; i++){
+                // avatars.push(data[i])
+                if (!newAvatarObj[i].uri && data[0]){
+                    newAvatarObj.splice(i, 1, data[0])
+                    data.shift()
+                }
+
             }
-            console.log(avatars)
-            console.log(userAvatar)
-            const newAvatarObj = userAvatar.concat(avatars)
             const results = newAvatarObj.filter((element: any) => {
                 if (Object.keys(element).length !== 0) {
                   return true;
@@ -387,7 +390,17 @@ const AddUserAvatar = () => {
               
                 return false;
             })
-            console.log(results)
+            // console.log(avatars)
+            // console.log(userAvatar)
+            // const newAvatarObj = userAvatar.concat(data)
+            // const results = newAvatarObj.filter((element: any) => {
+            //     if (Object.keys(element).length !== 0) {
+            //       return true;
+            //     }
+              
+            //     return false;
+            // })
+            console.log('newobj',newAvatarObj)
             setUserAvatar(results)
         }
     }
@@ -407,12 +420,11 @@ const AddUserAvatar = () => {
         //   }))
         const data = result?.assets;
         addAvatar(data, userAvatar)
-      };
-    
+    }
 
     const submitAvatar = async () => {
         console.log("submited")
-        const res = await submitInfoHandler('avatar', userAvatar)
+        const res = await submitMediaHandler('avatar', userAvatar)
         if (res){
             const jsonRes = res.data
             if (res.status !== 200) {
@@ -443,10 +455,10 @@ const AddUserAvatar = () => {
                             style={[styles.addAvatarBtnMain, styles.dFlex]}
                             onPress={openImageLibrary}>
                             {
-                                userAvatar[0] ? 
+                                userAvatar[0].uri ? 
                                 (
                                     <View style={styles.avatarThumbFrame}>
-                                        <Image source={{uri: userAvatar[0]}} style={styles.avatarThumb} />
+                                        <Image source={{uri: userAvatar[0].uri}} style={styles.avatarThumb} />
                                         <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(0)}}>
                                             <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={20} />
                                         </TouchableOpacity>
@@ -461,10 +473,10 @@ const AddUserAvatar = () => {
                                 style={[styles.addAvatarBtn1, styles.dFlex]}
                                 onPress={openImageLibrary}>
                                 {
-                                    userAvatar[1] ? 
+                                    userAvatar[1].uri ? 
                                     (
                                         <View style={styles.avatarThumbFrame}>
-                                            <Image source={{uri: userAvatar[1]}} style={styles.avatarThumb} />
+                                            <Image source={{uri: userAvatar[1].uri}} style={styles.avatarThumb} />
                                             <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(1)}}>
                                                 <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={14} />
                                             </TouchableOpacity>
@@ -478,10 +490,10 @@ const AddUserAvatar = () => {
                                 style={[styles.addAvatarBtn2, styles.dFlex]}
                                 onPress={openImageLibrary}>
                                 {
-                                    userAvatar[2] ? 
+                                    userAvatar[2].uri ? 
                                     (
                                         <View style={styles.avatarThumbFrame}>
-                                            <Image source={{uri: userAvatar[2]}} style={styles.avatarThumb} />
+                                            <Image source={{uri: userAvatar[2].uri}} style={styles.avatarThumb} />
                                             <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(2)}}>
                                                 <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={14} />
                                             </TouchableOpacity>
