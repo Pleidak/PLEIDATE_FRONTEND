@@ -5,7 +5,7 @@ import BackgroundGeolocation, {
     Location
 } from "react-native-background-geolocation";
 import { Text } from "react-native-elements";
-import { Colors } from "../constants/Colors";
+import { DefaultColors } from "../constants/DefaultColors";
 
 const LATITUDE_DELTA = 0.00922;
 const LONGITUDE_DELTA = 0.00421;
@@ -131,7 +131,7 @@ var styles = StyleSheet.create({
     markerIcon: {
         borderWidth:1,
         borderColor:'#000000',
-        backgroundColor: Colors.POLYLINE,
+        backgroundColor: DefaultColors.POLYLINE,
         //backgroundColor: 'rgba(0,179,253, 0.6)',
         width: 10,
         height: 10,

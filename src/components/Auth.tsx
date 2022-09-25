@@ -16,12 +16,14 @@ import authStyle from '../public/AuthStyles';
 import { useLogin } from '../contexts/LoginProvider';
 import { navigationStack } from './NavigationStack';
 import { color } from 'react-native-reanimated';
-import { Colors } from '../constants/Colors';
+import { DefaultColors } from '../constants/DefaultColors';
 import { defaultText } from '../constants/DefaultTexts';
 import { Button } from 'react-native-elements';
 import { CountryCode, Country, countryPhoneCode } from '../utils/countryCodeType'
 import { fonts } from 'react-native-elements/dist/config';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
 
 const AuthBegin = () => {
@@ -334,7 +336,13 @@ const AddUserName = () => {
                     </View>
                 </View>
                 <View style={[styles.dFlexRowStart, styles.flexRow]}>
-                    <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? message : null}</Text>
+                    {
+                        isError ? (
+                            <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? message : null}</Text>
+                        ): (
+                            undefined
+                        )
+                    }
                 </View>
                 <View style={[styles.half, styles.dFlex]}>
                     <View style={[styles.authMethod, styles.dFlex]}>
@@ -384,11 +392,9 @@ const AddUserAvatar = () => {
         }
     }
 
-    const removeAvatar = (data: any, userAvatar: any) => {
-        const avatars = userAvatar
-        if (data && userAvatar.length > 0){
-            userAvatar.splice(data, 1)
-            setUserAvatar(userAvatar)
+    const removeAvatar = (key: number) => {
+        if (userAvatar.length > 0){
+            setUserAvatar(userAvatar.filter(item => userAvatar.indexOf(item) != key))
         }
     }
 
@@ -404,7 +410,8 @@ const AddUserAvatar = () => {
       };
     
 
-    const submitName = async () => {
+    const submitAvatar = async () => {
+        console.log("submited")
         const res = await submitInfoHandler('avatar', userAvatar)
         if (res){
             const jsonRes = res.data
@@ -412,6 +419,7 @@ const AddUserAvatar = () => {
                 setIsError(true)
                 setMessage(jsonRes.message)
             } else {
+                console.log("ok")
                 setIsError(false)
                 setMessage(jsonRes.message)
             }   
@@ -437,7 +445,12 @@ const AddUserAvatar = () => {
                             {
                                 userAvatar[0] ? 
                                 (
-                                    <Image key='{key}' source={{uri: userAvatar[0]}} style={styles.avatarThumb} />
+                                    <View style={styles.avatarThumbFrame}>
+                                        <Image source={{uri: userAvatar[0]}} style={styles.avatarThumb} />
+                                        <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(0)}}>
+                                            <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={20} />
+                                        </TouchableOpacity>
+                                    </View>
                                 ):(
                                     <Text style={styles.addAvaterIcon}>+</Text>
                                 )
@@ -450,7 +463,12 @@ const AddUserAvatar = () => {
                                 {
                                     userAvatar[1] ? 
                                     (
-                                        <Image source={{uri: userAvatar[1]}} style={styles.avatarThumb} />
+                                        <View style={styles.avatarThumbFrame}>
+                                            <Image source={{uri: userAvatar[1]}} style={styles.avatarThumb} />
+                                            <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(1)}}>
+                                                <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={14} />
+                                            </TouchableOpacity>
+                                        </View>
                                     ):(
                                         <Text style={styles.addAvaterIcon}>+</Text>
                                     )
@@ -462,7 +480,12 @@ const AddUserAvatar = () => {
                                 {
                                     userAvatar[2] ? 
                                     (
-                                        <Image source={{uri: userAvatar[2]}} style={styles.avatarThumb} />
+                                        <View style={styles.avatarThumbFrame}>
+                                            <Image source={{uri: userAvatar[2]}} style={styles.avatarThumb} />
+                                            <TouchableOpacity style={styles.removeAvatarIconFrame} onPress={() => {removeAvatar(2)}}>
+                                                <FontAwesomeIcon style={styles.removeAvatarIcon} icon={faXmark} size={14} />
+                                            </TouchableOpacity>
+                                        </View>
                                     ):(
                                         <Text style={styles.addAvaterIcon}>+</Text>
                                     )
@@ -480,8 +503,8 @@ const AddUserAvatar = () => {
                     <View style={[styles.authMethod, styles.dFlex]}>
                         <TouchableOpacity style={[styles.button, styles.confirmBtn, styles.dFlex]} onPress={
                             async () => {
-                                await submitName()
-                                if (!isError){navigationStack.navigate('AvatarSubmit')}
+                                await submitAvatar()
+                                // if (!isError){navigationStack.navigate('AvatarSubmit')}
                             }
                             }>
                             <Text style={[styles.buttonText]}>Xác nhận</Text>
@@ -529,7 +552,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: Colors.LIGHT_THEME,
+        backgroundColor: DefaultColors.LIGHT_THEME,
         width: '100%',
         height: '100%',
     },
@@ -577,7 +600,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: '50%',
         marginBottom: '10%',
-        color: Colors.GREY_DARK,
+        color: DefaultColors.GREY_DARK,
         minHeight: '30%'
     },
     addAvatarExtra: {
@@ -589,12 +612,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     addAvatarBtnFocus: {
-        backgroundColor: Colors.GREY,
+        backgroundColor: DefaultColors.GREY,
     },
     addAvatarBtn1: {
         flex: 1,
         width: '100%',
-        backgroundColor: Colors.GREY_LIGHT,
+        backgroundColor: DefaultColors.GREY_LIGHT,
         marginLeft: 20,
         marginBottom: 5,
         borderRadius: 6,
@@ -602,14 +625,14 @@ const styles = StyleSheet.create({
     addAvatarBtn2: {
         flex: 1,
         width: '100%',
-        backgroundColor: Colors.GREY_LIGHT,
+        backgroundColor: DefaultColors.GREY_LIGHT,
         marginLeft: 20,
         borderRadius: 6
     },
     addAvatarBtnMain: {
         width: '60%',
         height: '100%',
-        backgroundColor: Colors.GREY_LIGHT,
+        backgroundColor: DefaultColors.GREY_LIGHT,
         borderRadius: 6,
         borderColor: 'transparent',
     },
@@ -619,19 +642,34 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 18,
     },
+    removeAvatarIconFrame: {
+        backgroundColor: 'white',
+        borderRadius: 50,
+        position: 'absolute',
+        bottom: 6,
+        right: 6,
+        padding: 3
+    },
+    removeAvatarIcon: {
+        color: 'black',
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: 18,
+    },
+    avatarThumbFrame: {width: '100%', height: '100%', overflow: 'hidden', borderRadius: 6, position: 'relative'},
     avatarThumb: {width: '100%', height: '100%', overflow: 'hidden', borderRadius: 6},
     tranparentBtn: {
         backgroundColor: 'None',
         borderWidth: 0,
     },
     textLink: {
-        color: Colors.BLUE,
+        color: DefaultColors.BLUE,
         textAlign: 'center',
         fontWeight: '600',
         fontSize: 16,
     },
     disableTextLink: {
-        color: Colors.GREY,
+        color: DefaultColors.GREY,
         textAlign: 'center',
         fontWeight: '600',
         fontSize: 16,
@@ -644,7 +682,7 @@ const styles = StyleSheet.create({
         paddingBottom: '5%',
     },
     blueBtn: {
-        backgroundColor: Colors.BLUE
+        backgroundColor: DefaultColors.BLUE
     },
     inputs: {
         display: 'flex',
@@ -652,7 +690,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: '10%',
         marginBottom: '10%',
-        color: Colors.GREY_DARK
+        color: DefaultColors.GREY_DARK
     },  
     input: {
         width: '100%',
@@ -727,7 +765,7 @@ const styles = StyleSheet.create({
         height: 55,
         lineHeight: 55,
         fontSize: 22,
-        borderColor: Colors.LIGHT_THEME,
+        borderColor: DefaultColors.LIGHT_THEME,
         textAlign: 'center',
         backgroundColor: 'white',
         color: 'black',

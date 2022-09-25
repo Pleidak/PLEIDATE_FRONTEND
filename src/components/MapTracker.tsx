@@ -9,7 +9,7 @@ import BackgroundGeolocation, {
   Subscription
 } from "react-native-background-geolocation";
 import { Button } from 'react-native-elements/dist/buttons/Button';
-import { Colors } from "../constants/Colors"
+import { DefaultColors } from "../constants/DefaultColors"
 import { logout } from "../api/Auth"
 import { AsyncStorage, getAsyncStorageItem, removeAsyncStorageItem } from "../utils/AsyncStorage"
 import { useLogin } from '../contexts/LoginProvider';
@@ -142,8 +142,8 @@ const MapTracker = () => {
     <View style={{alignItems:'center'}}>
       {/* <Text>Click to enable BackgroundGeolocation</Text> */}
       <Button
-            buttonStyle={{backgroundColor: Colors.THEME}}
-            titleStyle={{color: Colors.WHITE}}
+            buttonStyle={{backgroundColor: DefaultColors.THEME}}
+            titleStyle={{color: DefaultColors.WHITE}}
             title="Logout"
             onPress={async () => {
                 const isLoggedOut = await logout()

@@ -11,7 +11,7 @@ const LoginProvider = ({ children }) => {
   const [isActive, setisActive] = useState(false);
   const [profile, setProfile] = useState({});
   const [joinStatus, setJoinStatus] = useState(false)
-
+  
 
   const fetchUser = async () => {
     const getMeetingrRes = await getMeetings()

@@ -6,9 +6,9 @@ import {
     Button,
 } from 'react-native-elements'
 
+import { DefaultColors } from "../constants/DefaultColors"
 import MapTracker from "../components/MapTracker"
 import MatchMap from "../components/MatchMap"
-import { Colors } from "../constants/Colors"
 import { navigationStack } from  "../components/NavigationStack"
 // import { SocketProvider } from "../contexts/SocketProvider"
 
@@ -19,8 +19,8 @@ const MeetingScreen = () => {
         <View style={{ padding: 20, flex: 1, flexDirection: 'column', justifyContent: 'space-around' }}>
             <MapTracker></MapTracker>
             <Button
-                buttonStyle={{backgroundColor: Colors.THEME}}
-                titleStyle={{color: Colors.WHITE}}
+                buttonStyle={{backgroundColor: DefaultColors.THEME}}
+                titleStyle={{color: DefaultColors.WHITE}}
                 title="Match Map View"
                 onPress={() => {
                     console.log(222)
