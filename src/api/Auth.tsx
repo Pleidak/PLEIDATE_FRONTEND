@@ -55,7 +55,7 @@ const submitMediaHandler = async (infoKey: string, infoValue: any) => {
     }
     const formData = new FormData();
     for (let i = 0; i < infoValue.length; i++) {
-        formData.append('profile', {
+        formData.append('files', {
             name: new Date() + '_profile',
             uri: infoValue[i].uri,
             type: infoValue[i].type,

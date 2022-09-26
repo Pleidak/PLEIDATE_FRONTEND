@@ -372,16 +372,13 @@ const AddUserAvatar = () => {
     const [progress, setProgress] = useState(0);
 
     const addAvatar = (data: any, userAvatar: any) => {
-        // const avatars = []
         let newAvatarObj = userAvatar
         if (data && data.length <= 3){
             for (let i=0; i<newAvatarObj.length; i++){
-                // avatars.push(data[i])
                 if (!newAvatarObj[i].uri && data[0]){
                     newAvatarObj.splice(i, 1, data[0])
                     data.shift()
                 }
-
             }
             const results = newAvatarObj.filter((element: any) => {
                 if (Object.keys(element).length !== 0) {
@@ -390,25 +387,26 @@ const AddUserAvatar = () => {
               
                 return false;
             })
-            // console.log(avatars)
-            // console.log(userAvatar)
-            // const newAvatarObj = userAvatar.concat(data)
-            // const results = newAvatarObj.filter((element: any) => {
-            //     if (Object.keys(element).length !== 0) {
-            //       return true;
-            //     }
-              
-            //     return false;
-            // })
-            console.log('newobj',newAvatarObj)
             setUserAvatar(results)
         }
     }
 
     const removeAvatar = (key: number) => {
-        if (userAvatar.length > 0){
-            setUserAvatar(userAvatar.filter(item => userAvatar.indexOf(item) != key))
-        }
+        console.log('remove', userAvatar)
+        let newAvatarObj = userAvatar
+        newAvatarObj.splice(key, 1, {'uri': null})
+        const results = newAvatarObj.filter((element: any) => {
+            if (Object.keys(element).length !== 0) {
+              return true;
+            }
+          
+            return false;
+        })
+        setUserAvatar(results)
+        // setUserAvatar(userAvatar.filter(item => userAvatar.indexOf(item) != key))
+        // const newAva = userAvatar.splice(key, 1, {'uri': null})
+        // console.log(newAva)
+        // setUserAvatar((userAvatar) => userAvatar.splice(key, 1, {'uri': null}))
     }
 
     const openImageLibrary = async () => {
