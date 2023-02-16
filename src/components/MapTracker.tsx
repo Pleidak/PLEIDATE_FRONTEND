@@ -140,8 +140,8 @@ const MapTracker = () => {
 
   return (
     <View style={{alignItems:'center'}}>
-      {/* <Text>Click to enable BackgroundGeolocation</Text> */}
-      <Button
+      <Text>{location}</Text>
+      {/* <Button
             buttonStyle={{backgroundColor: DefaultColors.THEME}}
             titleStyle={{color: DefaultColors.WHITE}}
             title="Logout"
@@ -156,9 +156,8 @@ const MapTracker = () => {
                     socket.disconnect()
                 }
             }}
-            />
+            /> */}
       {/* <Switch value={enabled} onValueChange={setEnabled} /> */}
-      <Text style={{fontFamily:'monospace', fontSize:12}}>{location}</Text>
     </View>
   )
 }

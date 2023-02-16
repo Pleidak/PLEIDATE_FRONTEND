@@ -7,7 +7,6 @@ const getAsyncStorageItem = async (key: string) => {
         else {return false}
     }
     catch(err){
-        console.log(err)
         return false
     }
 }
@@ -17,7 +16,6 @@ const removeAsyncStorageItem = async (key: string) => {
         return true
     }
     catch(err){
-        console.log(err)
         return false
     }
 }

@@ -4,7 +4,6 @@
 // const TrackingProvider = ({children}) => {
 //     const [joinStatus, setJoinStatus] = useState(false)
 //     setJoinStatus(true)
-//     console.log(joinStatus)
 //     return (
 //         <JoinStatusContext.Provider value={{joinStatus, setJoinStatus}}>
 //             {children}

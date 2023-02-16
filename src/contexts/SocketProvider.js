@@ -3,7 +3,6 @@
 
 // const SocketProvider = ({children}) => {
 //     const [socket, setSocket] = useState(undefined)
-//     console.log("socket:     ", socket)
 //     return (
 //         <SocketContext.Provider value={{socket, setSocket}}>
 //             {children}

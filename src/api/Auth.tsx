@@ -21,50 +21,87 @@ const submitCodeHandler = async (phone: string, code: string) => {
             'Content-Type': 'application/json',
         }
     })
-    console.log(res)
     return res
 }
 
-const submitInfoHandler = async (infoKey: string, infoValue: any) => {
-    console.log(infoKey)
-    console.log(infoKey)
+const submitUserHandler = async (infoKey: string, infoValue: any) => {
     const token = await getAsyncStorageItem("@logintoken")
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    }
-    const body = {
+    const res = await client.post('/add-user-begin', {
         infoKey: infoKey,
         infoValue: infoValue
-    }
-    const res = await client.post('/addInfoBegin', body, {
-        headers: headers
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
     })
-    console.log(res)
+    return res
+}
+
+const submitUserInfoHandler = async (infoKey: string, infoValue: any) => {
+    const token = await getAsyncStorageItem("@logintoken")
+    const res = await client.post('/add-user-info-begin', {
+        infoKey: infoKey,
+        infoValue: infoValue
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return res
+}
+
+const submitUserExtraHandler = async (infoKey: string, infoValue: any) => {
+    const token = await getAsyncStorageItem("@logintoken")
+    const res = await client.post('/add-user-extra-begin',{
+        infoKey: infoKey,
+        infoValue: infoValue
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return res
+}
+const submitUserInterestHandler = async (infoKey: string, infoValue: any) => {
+    var interest = infoValue.filter(function (el: any) {
+        return el != null;
+    });
+    const token = await getAsyncStorageItem("@logintoken")
+    const res = await client.post('/add-user-interest-begin',{
+        infoKey: infoKey,
+        infoValue: interest
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        }
+    })
     return res
 }
 
 const submitMediaHandler = async (infoKey: string, infoValue: any) => {
-    console.log(infoKey)
-    console.log(infoKey)
     const token = await getAsyncStorageItem("@logintoken")
-    const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`
-    }
     const formData = new FormData();
     for (let i = 0; i < infoValue.length; i++) {
-        formData.append('files', {
-            name: new Date() + '_profile',
-            uri: infoValue[i].uri,
-            type: infoValue[i].type,
-          });
+        if (infoValue[i].path && infoValue[i].order){
+            formData.append('files', {
+                name: new Date() + '_profile',
+                uri: infoValue[i].path,
+                type: infoValue[i].mime,
+            });
+            formData.append('order', infoValue[i].order)
+        }
     } 
-    const res = await client.post('/addMedia', formData, {
-        headers: headers
+    const res = await client.post('/add-media', formData, {
+        headers:  {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+        }
     })
-    console.log(res)
     return res
 }
 
@@ -84,4 +121,4 @@ const logout = async ()=> {
    
 }
 
-export {submitPhonehandler, submitCodeHandler, submitInfoHandler, submitMediaHandler, logout}
+export {submitPhonehandler, submitCodeHandler, submitUserInfoHandler, submitUserExtraHandler, submitMediaHandler, submitUserInterestHandler, submitUserHandler, logout}
