@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "BGGeolocation.app"
-               BlueprintName = "BGGeolocation"
-               ReferencedContainer = "container:BGGeolocation.xcodeproj">
+               BuildableName = "Pleidate.app"
+               BlueprintName = "Pleidate"
+               ReferencedContainer = "container:Pleidate.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "BGGeolocationTests.xctest"
-               BlueprintName = "BGGeolocationTests"
-               ReferencedContainer = "container:BGGeolocation.xcodeproj">
+               BuildableName = "PleidateTests.xctest"
+               BlueprintName = "PleidateTests"
+               ReferencedContainer = "container:Pleidate.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "BGGeolocation.app"
-            BlueprintName = "BGGeolocation"
-            ReferencedContainer = "container:BGGeolocation.xcodeproj">
+            BuildableName = "Pleidate.app"
+            BlueprintName = "Pleidate"
+            ReferencedContainer = "container:Pleidate.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "BGGeolocation.app"
-            BlueprintName = "BGGeolocation"
-            ReferencedContainer = "container:BGGeolocation.xcodeproj">
+            BuildableName = "Pleidate.app"
+            BlueprintName = "Pleidate"
+            ReferencedContainer = "container:Pleidate.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
